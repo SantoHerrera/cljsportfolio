@@ -11,11 +11,13 @@
 (defn vec-remove
   "remove elem in coll"
   [coll pos]
-  (vec (concat (subvec coll 0 pos) (subvec coll (inc pos)))))
+  (vec (concat (subvec coll 0 pos)
+               (subvec coll (inc pos)))))
 
 ;; NOTE ditto for the state initialization process
-(defonce init (do (add-todo "I like trains")
-                  (add-todo "buy milk")))
+(defonce init
+  (do (add-todo "I like trains")
+      (add-todo "buy milk")))
 
 ;; -------------------------
 ;; Views
@@ -24,16 +26,16 @@
 
 (defn todo-item [id {:keys [text done?]}]
   (let [html-id  (str "todo" id)]
-    [:li
-     [:input {:type :checkbox
-              :checked done?
-              :id html-id
-              :on-change #(swap! todos update-in [id :done?] not)}]
-     [:label {:for html-id} text]
-     [:a {:style {:margin-left 7}
-          :href "#"
-          :on-click #(swap! todos vec-remove id)}
-      "X"]]))
+    [:tr
+     [:td>input {:type :checkbox
+                 :checked done?
+                 :id html-id
+                 :on-change #(swap! todos update-in [id :done?] not)}]
+     [:td>label {:for html-id} text]
+     [:td>a {:href "#"
+             :on-click #(swap! todos vec-remove id)
+             :style {:margin-left 7}}
+      "🗑"]]))
 
 (defn form-todo []
   [:div.form-todo
@@ -46,7 +48,8 @@
 (defn home-page []
   [:div
    [:h1 "TODO"]
-   [:ul (map todo-item (iterate inc 0) @todos)]
+   [:table>tbody
+    (map todo-item (iterate inc 0) @todos)]
    (form-todo)
    [:h2 "Raw state content"]
    [:pre (with-out-str
